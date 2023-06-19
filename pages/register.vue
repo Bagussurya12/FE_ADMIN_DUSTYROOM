@@ -21,6 +21,7 @@
               color="black"
               :rules="rules.email"
               v-model="form.email"
+              @keyup="checkEmaiExist"
               light
             />
             <v-text-field
@@ -51,7 +52,7 @@
               light
             />
             <v-text-field
-              name="repassword"
+              name="retype_password"
               label="Re-password"
               type="password"
               color="black"
@@ -82,6 +83,7 @@
 </template>
 <script>
 export default {
+  middleware: ['unauthenticated'],
   data() {
     return {
       emailExist: false,
@@ -95,21 +97,23 @@ export default {
         retype_password: '',
       },
       rules: {
-        fullname: [(v) => !!v || 'FULL NAME IS REQUIRED'],
+        fullname: [(v) => !!v || this.$t('Full_Name_Is_Required')],
         email: [
-          (v) => !!v || 'EMAIL IS REQUIRED',
-          (v) => /.+@.+/.test(v) || 'Email InValid',
-          (v) => !this.emailExist || 'EMAIL_EXIST',
+          (v) => !!v || this.$t('Email_Is_Required'),
+          (v) => /.+@.+/.test(v) || this.$t('Email_InValid'),
+          (v) => !this.emailExist || this.$t('EMAIL_EXIST'),
         ],
-        addres: [(v) => !!v || 'Addres Is Required'],
+        phoneNumber: [(v) => !!v || this.$t('Phone_Number_Is_Required')],
+        addres: [(v) => !!v || this.$t('Addres_Is_Required')],
         password: [
-          (v) => !!v || 'Password Is Required',
-          (v) => v.length >= 7 || 'Password Must Be at Least 7 Character',
+          (v) => !!v || this.$t('Password_Is_Required'),
+          (v) =>
+            v.length >= 7 || this.$t('Password_Must_Be_at_Least_7_Character'),
         ],
         retype_password: [
           (v) =>
             v === this.form.password ||
-            'Re password Must Be Same With Password',
+            this.$t('Re_Password_Must_Be_Same_With_Password'),
         ],
       },
     }

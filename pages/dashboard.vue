@@ -10,3 +10,9 @@
     </v-col>
   </v-row>
 </template>
+
+<script>
+export default {
+  middleware: ['authenticated'],
+}
+</script>
