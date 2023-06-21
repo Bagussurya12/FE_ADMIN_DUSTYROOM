@@ -50,7 +50,7 @@ export default {
           icon: 'mdi-home',
           title: 'Home',
           to: '/',
-          middleware: ['authenticated'],
+          middleware: ['admin', 'employee'],
         },
         {
           icon: 'mdi-view-dashboard-variant',
@@ -59,10 +59,16 @@ export default {
           middleware: ['authenticated'],
         },
         {
-          icon: 'mdi-account',
-          title: 'Profile',
-          to: '/Profile',
-          middleware: ['authenticated'],
+          icon: 'mdi-account-group',
+          title: 'User Management',
+          to: '/users',
+          middleware: ['admin'],
+        },
+        {
+          icon: 'mdi-order-bool-descending',
+          title: 'Order Management',
+          to: '/orderManagement',
+          middleware: ['admin', 'employee'],
         },
         {
           icon: 'mdi-login',

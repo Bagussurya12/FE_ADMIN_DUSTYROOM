@@ -2,8 +2,9 @@
   <v-row>
     <v-col cols="10" offset="1" md="4" offset-md="4">
       <v-card>
-        <v-toolbar color="black" dark>Register</v-toolbar>
+        <v-toolbar color="black" dark>Add User</v-toolbar>
         <v-card-text color="black" dark>
+          <v-breadcrumbs :items="breadCrumbs" class="pa-0"></v-breadcrumbs>
           <v-form ref="form">
             <v-text-field
               name="name"
@@ -35,7 +36,7 @@
             />
             <v-text-field
               name="addres"
-              label="Addres"
+              label="Address"
               type="text"
               color="black"
               :rules="rules.addres"
@@ -60,12 +61,19 @@
               v-model="form.retype_password"
               light
             />
+            <v-select
+              v-model="form.role"
+              :items="roles"
+              label="Role"
+              color="black"
+              light
+            ></v-select>
           </v-form>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="black" dark @click="onSubmit" :disabled="isDisable">
-            <span v-if="!isDisable">Register</span>
+            <span v-if="!isDisable">Save</span>
             <v-progress-circular
               v-else
               color="black"
@@ -74,20 +82,29 @@
           </v-btn>
         </v-card-actions>
       </v-card>
-      <p>
-        Do You Have an account?
-        <v-btn to="/login" plain class="text-btn">Login</v-btn>
-      </p>
     </v-col>
   </v-row>
 </template>
 <script>
 export default {
-  middleware: ['unauthenticated'],
+  middleware: ['authenticated'],
   data() {
     return {
-      emailExist: false,
       isDisable: false,
+      roles: ['admin', 'employee', 'customer'],
+      emailExist: false,
+      breadCrumbs: [
+        {
+          text: 'Users',
+          disabled: false,
+          to: '/users',
+          exact: true,
+        },
+        {
+          text: 'Create',
+          disabled: true,
+        },
+      ],
       form: {
         fullname: '',
         email: '',
@@ -95,6 +112,7 @@ export default {
         addres: '',
         password: '',
         retype_password: '',
+        role: '',
       },
       rules: {
         fullname: [(v) => !!v || this.$t('Full_Name_Is_Required')],
@@ -115,6 +133,7 @@ export default {
             v === this.form.password ||
             this.$t('Re_Password_Must_Be_Same_With_Password'),
         ],
+        role: [(v) => v === this.form.password || this.$t('Role_IS_Required')],
       },
     }
   },
@@ -122,24 +141,30 @@ export default {
     checkEmailExist() {
       this.emailExist = false
     },
-
     onSubmit() {
       if (this.$refs.form.validate()) {
-        ;(this.isDisable = true),
-          this.$axios
-            .$post('/auth/register', this.form)
-            .then((response) => {
-              this.isDisable = false
-              // Redirect To Login Page
-              this.$router.push('/login')
+        this.isDisable = true
+        this.$axios
+          .$post('/users', this.form)
+          .then((response) => {
+            this.isDisable = false
+
+            // Redirect To Users Page
+            this.$router.push({
+              name: 'users___' + this.$i18n.locale,
+              params: {
+                message: 'CREATE_SUCCESS',
+                fullname: this.form.fullname,
+              },
             })
-            .catch((error) => {
-              if (error.response.data.message == 'EMAIL_EXIST') {
-                this.emailExist = true
-                this.$refs.form.validate()
-              }
-              this.isDisable = false
-            })
+          })
+          .catch((error) => {
+            if (error.response.data.message == 'EMAIL_EXIST') {
+              this.emailExist = true
+              this.$refs.form.validate()
+            }
+            this.isDisable = false
+          })
       }
     },
   },

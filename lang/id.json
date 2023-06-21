@@ -11,5 +11,10 @@
   "Addres_Is_Required": "Alamat Wajib Di Isi",
   "Password_Is_Required": "Password Harus Di Isi",
   "Password_Must_Be_at_Least_7_Character": "Password Minimal 7 Karakter",
-  "Re_Password_Must_Be_Same_With_Password": "Re-Password Harus Sama Dengan Password"
+  "Re_Password_Must_Be_Same_With_Password": "Re-Password Harus Sama Dengan Password",
+
+  "UPDATE_SUCCESS": "Update data {title} berhasil",
+  "ID_NOT_FOUND": "ID Tidak Ditemukan",
+  "CREATE_SUCCESS": "Membuat data user {title} berhasil",
+  "DELETE_SUCCESS": "Berhasil menghapus data {title}"
 }

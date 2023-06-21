@@ -72,7 +72,7 @@ export default {
     onSubmit() {
       ;(this.isDisable = true), console.log(this.form)
       this.$axios
-        .$post('http://localhost:3000/auth/login', this.form)
+        .$post('/auth/login', this.form)
         .then((response) => {
           this.isDisable = false
           // Store Passed Welcome
