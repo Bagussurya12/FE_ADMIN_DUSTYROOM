@@ -3,7 +3,7 @@
     <v-col cols="10" offset="1">
       <v-card class="my-3">
         <v-toolbar color="black" dark>
-          Users Management
+          Payment Management
           <v-spacer></v-spacer>
           <v-text-field
             v-model="search"
@@ -11,8 +11,7 @@
             label="search"
             single-line
             hide-details
-          >
-          </v-text-field>
+          ></v-text-field>
         </v-toolbar>
         <v-card-text>
           <v-alert v-if="alert.show" :type="alert.type">
@@ -21,15 +20,15 @@
           <div class="mb-4 d-flex">
             <v-breadcrumbs :items="breadCrumbs" class="pa-0" />
             <v-spacer></v-spacer>
-            <v-btn to="/users/create" color="black" dark elevation="3" small>
-              Add User <v-icon right>mdi-plus-circle</v-icon></v-btn
-            >
+            <v-btn to="/payment/create" color="black" dark elevation="3" small>
+              Add Payment <v-icon right>mdi-plus-circle</v-icon>
+            </v-btn>
           </div>
           <v-data-table
             :headers="headers"
             :items-per-page="10"
             :server-items-length="totalData"
-            :items="users"
+            :items="payments"
             :loading="loading"
             :search.sync="search"
             :options.sync="options"
@@ -41,7 +40,7 @@
               <v-dialog v-model="dialogDelete" max-width="500px">
                 <v-card>
                   <v-card-title
-                    >Delete This Data {{ itemDelete.fullname }}?</v-card-title
+                    >Delete This Data {{ itemDelete.orderId }}?</v-card-title
                   >
                   <v-card-actions>
                     <v-btn color="black " dark text @click="closeDelete"
@@ -53,14 +52,18 @@
                       dark
                       text
                       @click="deleteConfirm(itemDelete._id)"
-                      >Delete</v-btn
                     >
+                      Delete
+                    </v-btn>
                   </v-card-actions>
                 </v-card>
               </v-dialog>
             </template>
             <template v-slot:item.actions="{ item }">
-              <v-btn :to="`users/edit/${item._id}`" icon color="black" dark>
+              <v-btn :to="`payment/detail/${item._id}`" icon color="black" dark>
+                <v-icon class="small">mdi-loupe</v-icon>
+              </v-btn>
+              <v-btn :to="`payment/edit/${item._id}`" icon color="black" dark>
                 <v-icon class="small">mdi-pencil</v-icon>
               </v-btn>
               <v-btn color="black" dark small @click="deleteItem(item)" icon>
@@ -76,11 +79,10 @@
 
 <script>
 import { mapState } from 'vuex'
-
 export default {
   middleware: ['authenticated'],
   head: {
-    title: 'USERS MANAGEMENT',
+    title: 'PAYMENTS MANAGEMENT',
   },
   data() {
     return {
@@ -95,39 +97,45 @@ export default {
         type: '',
         message: '',
       },
-      users: [],
+      payments: [],
       headers: [
         { text: '#', value: 'row', sortable: false },
-        { text: 'Full Name', value: 'fullname', sortable: false },
-        { text: 'Email', value: 'email', sortable: false },
-        { text: 'Phone Number ', value: 'phoneNumber', sortable: false },
-        { text: 'Role ', value: 'role', sortable: false },
+        { text: 'ID', value: '_id', sortable: false },
+        { text: 'USER ID', value: 'userId', sortable: false },
+        { text: 'ORDER ID', value: 'orderId', sortable: false },
+        { text: 'SENDER', value: 'senderName', sortable: false },
+        { text: 'BANK NAME', value: 'bank', sortable: false },
+        { text: 'BANK ACCOUNT', value: 'bankAccount', sortable: false },
+        { text: 'AMOUNT', value: 'amount', sortable: false },
+        { text: 'IMAGE', value: 'image', sortable: false },
+        { text: 'STATUS', value: 'status', sortable: false },
         { text: '', value: 'actions', sortable: false },
       ],
       breadCrumbs: [
         {
-          text: 'Users',
+          text: 'PAYMENTS',
           disabled: true,
-          to: '/users',
+          to: '/payment',
         },
       ],
     }
   },
   methods: {
-    fetchUsers() {
+    fetchPayments() {
       const { page, itemsPerPage } = this.options
       this.loading = true
 
       this.$axios
-        .$get(`/users?page=${page}&limit=${itemsPerPage}&search=${this.search}`)
+        .$get(
+          `/payments/payments?page=${page}&limit=${itemsPerPage}&search=${this.search}`
+        )
         .then((response) => {
           this.loading = false
-          this.users = response.users.docs
-          this.totalData = response.users.totalDocs
-
-          // let startItem = (page - 1) * itemsPerPage + 1
-          let startItem = response.users.pagingCounter
-          this.users.map((user) => (user.row = startItem++))
+          this.payments = response.payment.docs
+          this.totalData = response.payment.totalDocs
+          console.log(response)
+          let startItem = response.payment.pagingCounter
+          this.payments.map((payment) => (payment.row = startItem++))
         })
         .catch((err) => {
           this.loading = false
@@ -143,14 +151,12 @@ export default {
     },
     deleteConfirm(id) {
       this.$axios
-        .$delete(`/users/${id}`)
+        .$delete(`/payments/${id}`)
         .then((response) => {
-          // Process Delete data table
-
-          this.users = this.users.filter((user) => user._id != id)
+          this.payments = this.payments.filter((payment) => payment._id != id)
           let params = {
             message: 'DELETE_SUCCESS',
-            fullname: this.itemDelete.fullname,
+            orderId: this.itemDelete.orderId,
           }
           this.showAlert(params)
           this.closeDelete()
@@ -192,18 +198,16 @@ export default {
   watch: {
     options: {
       handler() {
-        this.fetchUsers()
+        this.fetchPayments()
       },
       deep: true,
     },
     search: {
       handler() {
-        this.fetchUsers()
+        this.fetchPayments()
       },
-      // deep: true,
     },
   },
-
   mounted() {
     this.showAlert(this.$route.params)
   },

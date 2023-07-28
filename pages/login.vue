@@ -1,9 +1,18 @@
 <template>
-  <v-row>
-    <v-col cols="10" offset="1" md="4" offset-md="4">
-      <v-card>
+  <v-row class="d-flex flex-wrap">
+    <v-col cols="8">
+      <div>
+        <v-img
+          :src="require(`../assets/images/login.png`)"
+          :width="750"
+          cover
+        ></v-img>
+      </div>
+    </v-col>
+    <v-col cols="3" class="mt-5">
+      <v-card class="mt-5 mb-5">
         <v-toolbar color="black" dark>Login</v-toolbar>
-        <v-card-text>
+        <v-card-text class="mt-5">
           <v-form>
             <v-text-field
               name="email"
@@ -21,7 +30,14 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="black" dark @click="onSubmit" :disabled="isDisable">
+          <v-btn
+            color="black"
+            dark
+            @click="onSubmit"
+            :disabled="isDisable"
+            block
+            class="mb-5"
+          >
             <span v-if="!isDisable">Login</span>
             <v-progress-circular
               v-else
@@ -31,10 +47,7 @@
           </v-btn>
         </v-card-actions>
       </v-card>
-      <p>
-        Do You Have an account?
-        <v-btn to="/register" plain class="text-btn">Register</v-btn>
-      </p>
+
       <v-alert color="red lighten-2" dark v-if="isError">
         {{ $t(message) }}
       </v-alert>
@@ -102,3 +115,8 @@ export default {
   },
 }
 </script>
+<style>
+.no-view {
+  display: none;
+}
+</style>

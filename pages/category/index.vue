@@ -3,7 +3,7 @@
     <v-col cols="10" offset="1">
       <v-card class="my-3">
         <v-toolbar color="black" dark>
-          Users Management
+          Category Management
           <v-spacer></v-spacer>
           <v-text-field
             v-model="search"
@@ -11,8 +11,7 @@
             label="search"
             single-line
             hide-details
-          >
-          </v-text-field>
+          ></v-text-field>
         </v-toolbar>
         <v-card-text>
           <v-alert v-if="alert.show" :type="alert.type">
@@ -21,27 +20,27 @@
           <div class="mb-4 d-flex">
             <v-breadcrumbs :items="breadCrumbs" class="pa-0" />
             <v-spacer></v-spacer>
-            <v-btn to="/users/create" color="black" dark elevation="3" small>
-              Add User <v-icon right>mdi-plus-circle</v-icon></v-btn
+            <v-btn to="/category/create" color="black" dark elevation="3" small>
+              Add Category <v-icon right>mdi-plus-circle</v-icon></v-btn
             >
           </div>
           <v-data-table
             :headers="headers"
             :items-per-page="10"
             :server-items-length="totalData"
-            :items="users"
+            :items="categories"
             :loading="loading"
             :search.sync="search"
             :options.sync="options"
             :footer-props="{
-              itemsPerPageOptions: [10, 20, 30],
+              itemsPerPageOptions: [5, 10, 15],
             }"
           >
             <template v-slot:top>
               <v-dialog v-model="dialogDelete" max-width="500px">
                 <v-card>
                   <v-card-title
-                    >Delete This Data {{ itemDelete.fullname }}?</v-card-title
+                    >Hapus Data {{ itemDelete.title }}?</v-card-title
                   >
                   <v-card-actions>
                     <v-btn color="black " dark text @click="closeDelete"
@@ -60,7 +59,7 @@
               </v-dialog>
             </template>
             <template v-slot:item.actions="{ item }">
-              <v-btn :to="`users/edit/${item._id}`" icon color="black" dark>
+              <v-btn :to="`category/edit/${item._id}`" icon color="black" dark>
                 <v-icon class="small">mdi-pencil</v-icon>
               </v-btn>
               <v-btn color="black" dark small @click="deleteItem(item)" icon>
@@ -75,12 +74,10 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
-
 export default {
   middleware: ['authenticated'],
   head: {
-    title: 'USERS MANAGEMENT',
+    title: 'CATEGORIES MANAGEMENT',
   },
   data() {
     return {
@@ -95,39 +92,39 @@ export default {
         type: '',
         message: '',
       },
-      users: [],
+      categories: [],
       headers: [
         { text: '#', value: 'row', sortable: false },
-        { text: 'Full Name', value: 'fullname', sortable: false },
-        { text: 'Email', value: 'email', sortable: false },
-        { text: 'Phone Number ', value: 'phoneNumber', sortable: false },
-        { text: 'Role ', value: 'role', sortable: false },
+        { text: 'ID', value: '_id', sortable: false },
+        { text: 'Name', value: 'title', sortable: false },
         { text: '', value: 'actions', sortable: false },
       ],
       breadCrumbs: [
         {
-          text: 'Users',
+          text: 'Category',
           disabled: true,
-          to: '/users',
+          to: '/categories',
         },
       ],
     }
   },
   methods: {
-    fetchUsers() {
+    fetchCategory() {
       const { page, itemsPerPage } = this.options
       this.loading = true
 
       this.$axios
-        .$get(`/users?page=${page}&limit=${itemsPerPage}&search=${this.search}`)
+        .$get(
+          `/categories/category?page=${page}&limit=${itemsPerPage}&search=${this.search}`
+        )
         .then((response) => {
           this.loading = false
-          this.users = response.users.docs
-          this.totalData = response.users.totalDocs
+          this.categories = response.categories.docs
+          this.totalData = response.categories.totalDocs
 
           // let startItem = (page - 1) * itemsPerPage + 1
-          let startItem = response.users.pagingCounter
-          this.users.map((user) => (user.row = startItem++))
+          let startItem = response.categories.pagingCounter
+          this.categories.map((category) => (category.row = startItem++))
         })
         .catch((err) => {
           this.loading = false
@@ -143,14 +140,14 @@ export default {
     },
     deleteConfirm(id) {
       this.$axios
-        .$delete(`/users/${id}`)
+        .$delete(`/categories/${id}`)
         .then((response) => {
-          // Process Delete data table
-
-          this.users = this.users.filter((user) => user._id != id)
+          this.categories = this.categories.filter(
+            (category) => category._id != id
+          )
           let params = {
             message: 'DELETE_SUCCESS',
-            fullname: this.itemDelete.fullname,
+            categoryId: this.itemDelete.categoryId,
           }
           this.showAlert(params)
           this.closeDelete()
@@ -166,25 +163,25 @@ export default {
         ;(this.alert.show = true),
           (this.alert.type = 'success'),
           (this.alert.message = this.$t(params.message, {
-            title: params.fullname,
+            title: params.title,
           }))
       } else if (params.message == 'DELETE_SUCCESS') {
         ;(this.alert.show = true),
           (this.alert.type = 'success'),
           (this.alert.message = this.$t(params.message, {
-            title: params.fullname,
+            title: params.title,
           }))
       } else if (params.message == 'CREATE_SUCCESS') {
         ;(this.alert.show = true),
           (this.alert.type = 'success'),
           (this.alert.message = this.$t(params.message, {
-            title: params.fullname,
+            title: params.title,
           }))
       } else if (params.message == 'ID_NOT_FOUND') {
         ;(this.alert.show = true),
           (this.alert.type = 'error'),
           (this.alert.message = this.$t(params.message, {
-            title: params.fullname,
+            title: params.title,
           }))
       }
     },
@@ -192,18 +189,16 @@ export default {
   watch: {
     options: {
       handler() {
-        this.fetchUsers()
+        this.fetchCategory()
       },
       deep: true,
     },
     search: {
       handler() {
-        this.fetchUsers()
+        this.fetchCategory()
       },
-      // deep: true,
     },
   },
-
   mounted() {
     this.showAlert(this.$route.params)
   },

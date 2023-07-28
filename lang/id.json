@@ -4,7 +4,7 @@
   "EMAIL_NOT_FOUND": "EMAIL TIDAK DI TEMUKAN",
   "AUTH_REQUIRED": "Untuk Mengakses Anda Harus Login",
   "Full_Name_Is_Required": "Fullname Harus Di Isi",
-  "Email_Is_Required": "Email Harus Di Isi",
+
   "Email_InValid": "Format Email Tidak Valid",
   "EMAIL_EXIST": "Email Telah digunakan",
   "Phone_Number_Is_Required": "Nomor Handphone Harus Di isi",
@@ -15,6 +15,30 @@
 
   "UPDATE_SUCCESS": "Update data {title} berhasil",
   "ID_NOT_FOUND": "ID Tidak Ditemukan",
-  "CREATE_SUCCESS": "Membuat data user {title} berhasil",
-  "DELETE_SUCCESS": "Berhasil menghapus data {title}"
+  "CREATE_SUCCESS": "Membuat data {title} berhasil",
+  "DELETE_SUCCESS": "Berhasil menghapus data {title}",
+  "TITLE_IS_REQUIRED": "Title Wajib Di Isi",
+  "PRICE_IS_REQUIRED": "Price Wajib Di Isi",
+
+  "SHIRT_COLOR_IS_REQUIRED": "Warna Harus di isi",
+  "MATERIAL_IS_REQUIRED": "Title Wajib Di Isi",
+  "AMOUNT_IS_REQUIRED ": " Jumlah Wajib di isi",
+
+  "PROCESS_IS_REQUIRED": "Proses pesanan wajib di isi",
+  "STATUS_IS_REQUIRED": "STATUS WAJIB DI ISI",
+  "ORDERID_IS_REQUIRED": "ID ORDER HARUS DI ISI",
+  "SENDER_NAME_IS_REQUIRED": "NAMA PENGIRIM WAJIB DI ISI",
+  "BANK_IS_REQUIRED": "NAMA BANK HARUS DI ISI",
+  "BANK_ACCOUNT_IS_REQUIRED": "NOMOR REKENING HARUS DI ISI",
+
+  "PRODUCT_IS_REQUIRED": "PRODUK YANG DI PESAN HARUS DI ISI",
+  "CUSTOMER_NAME_IS_REQUIRED": "NAMA PELANGGAN HARUS DI ISI",
+  "EMAIL_IS_REQUIRED": "EMAIL HARUS DI ISI",
+  "PHONE_NUMBER_IS_REQUIRED": "NOMOR HAND PHONE PEMESAN HARUS DI ISI",
+  "AMOUNT_IS_REQUIRED": "JUMLAH PESANAN HARUS DI ISI",
+  "COLOR_IS_REQUIRED": "WARNA PESANAN HARUS DI ISI",
+  "PRINTING_TYPE_IS_REQUIRED": " JENIS SABLON HARUS DI ISI",
+  "IMAGE_IS_REQUIRED": "DESAIGN HARUS DI ISI",
+  "DESCRIPTION_IS_REQUIRED": "DESKRIPSI HARUS DI ISI",
+  "AMOUNT_PAYMENT_IS_REQUIRED": "TOTAL HARGA HARUS DI ISI"
 }

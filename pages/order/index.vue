@@ -3,46 +3,48 @@
     <v-col cols="10" offset="1">
       <v-card class="my-3">
         <v-toolbar color="black" dark>
-          Users Management
-          <v-spacer></v-spacer>
+          Orders Management
+          <v-spacer> </v-spacer>
           <v-text-field
             v-model="search"
             append-icon="mdi-magnify"
-            label="search"
+            label="search order"
             single-line
             hide-details
           >
           </v-text-field>
         </v-toolbar>
         <v-card-text>
-          <v-alert v-if="alert.show" :type="alert.type">
-            {{ alert.message }}
-          </v-alert>
+          <v-alert v-if="alert.show" :type="alert.type">{{
+            alert.message
+          }}</v-alert>
+
           <div class="mb-4 d-flex">
             <v-breadcrumbs :items="breadCrumbs" class="pa-0" />
             <v-spacer></v-spacer>
-            <v-btn to="/users/create" color="black" dark elevation="3" small>
-              Add User <v-icon right>mdi-plus-circle</v-icon></v-btn
-            >
+            <v-btn to="/order/create" color="black" dark elevation="3" small
+              >Add order
+              <v-icon right> mdi-plus-circle</v-icon>
+            </v-btn>
           </div>
           <v-data-table
             :headers="headers"
             :items-per-page="10"
             :server-items-length="totalData"
-            :items="users"
+            :items="orders"
             :loading="loading"
-            :search.sync="search"
+            :searc.sync="search"
             :options.sync="options"
             :footer-props="{
               itemsPerPageOptions: [10, 20, 30],
             }"
           >
             <template v-slot:top>
-              <v-dialog v-model="dialogDelete" max-width="500px">
+              <v-dialog v-model="dialogDelete" max-width="400px">
                 <v-card>
-                  <v-card-title
-                    >Delete This Data {{ itemDelete.fullname }}?</v-card-title
-                  >
+                  <v-card-title>
+                    Hapus Data ini {{ itemDelete.customerName }}
+                  </v-card-title>
                   <v-card-actions>
                     <v-btn color="black " dark text @click="closeDelete"
                       >Cancel</v-btn
@@ -60,7 +62,10 @@
               </v-dialog>
             </template>
             <template v-slot:item.actions="{ item }">
-              <v-btn :to="`users/edit/${item._id}`" icon color="black" dark>
+              <v-btn :to="`order/detail/${item._id}`" icon color="black" dark>
+                <v-icon class="small">mdi-loupe</v-icon>
+              </v-btn>
+              <v-btn :to="`order/edit/${item._id}`" icon color="black" dark>
                 <v-icon class="small">mdi-pencil</v-icon>
               </v-btn>
               <v-btn color="black" dark small @click="deleteItem(item)" icon>
@@ -75,17 +80,15 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
-
 export default {
-  middleware: ['authenticated'],
+  middlewar: ['authenticated'],
   head: {
-    title: 'USERS MANAGEMENT',
+    title: 'ORDER MANAGEMENT',
   },
   data() {
     return {
       itemDelete: '',
-      dialogDelete: false,
+      dialogDelete: '',
       search: '',
       loading: false,
       options: {},
@@ -95,39 +98,55 @@ export default {
         type: '',
         message: '',
       },
-      users: [],
+      orders: [],
       headers: [
         { text: '#', value: 'row', sortable: false },
-        { text: 'Full Name', value: 'fullname', sortable: false },
-        { text: 'Email', value: 'email', sortable: false },
-        { text: 'Phone Number ', value: 'phoneNumber', sortable: false },
-        { text: 'Role ', value: 'role', sortable: false },
+        { text: 'ID Pesanan', value: '_id', sortable: false },
+        { text: 'Nama Produk', value: 'product', sortable: false },
+        { text: 'Nama Pemasan', value: 'customerName', sortable: false },
+        {
+          text: 'Nomor Handphone',
+          value: 'phoneNumberCustomer',
+          sortable: false,
+        },
+        { text: 'Email', value: 'emailCustomer', sortable: false },
+        // { text: 'Barang Pesanan', value: '', sortable: false },
+        { text: 'Warna', value: 'shirtColor', sortable: false },
+        { text: 'Jumlah Barang', value: 'amountOrder', sortable: false },
+        { text: 'Jumlah Total', value: 'amountPayment', sortable: false },
+        { text: 'Jenis Sablon', value: 'printingType', sortable: false },
+        { text: 'Status Pembayaran', value: 'paymentStatus', sortable: false },
+        { text: 'Proses', value: 'orderProcess', sortable: false },
+        { text: 'Di pesan', value: 'createdAt', sortable: false },
+        { text: 'status', value: 'status', sortable: false },
         { text: '', value: 'actions', sortable: false },
       ],
       breadCrumbs: [
         {
-          text: 'Users',
+          text: 'Order',
           disabled: true,
-          to: '/users',
+          to: '/order',
         },
       ],
     }
   },
   methods: {
-    fetchUsers() {
+    fetchOrders() {
       const { page, itemsPerPage } = this.options
       this.loading = true
 
       this.$axios
-        .$get(`/users?page=${page}&limit=${itemsPerPage}&search=${this.search}`)
+        .$get(
+          `/orders/order?page=${page}&limit=${itemsPerPage}&search=${this.search}`
+        )
         .then((response) => {
           this.loading = false
-          this.users = response.users.docs
-          this.totalData = response.users.totalDocs
+          this.orders = response.orders.docs
+          this.totalData = response.orders.totalDocs
 
           // let startItem = (page - 1) * itemsPerPage + 1
-          let startItem = response.users.pagingCounter
-          this.users.map((user) => (user.row = startItem++))
+          let startItem = response.orders.pagingCounter
+          this.orders.map((orders) => (orders.row = startItem++))
         })
         .catch((err) => {
           this.loading = false
@@ -143,30 +162,34 @@ export default {
     },
     deleteConfirm(id) {
       this.$axios
-        .$delete(`/users/${id}`)
+        .$delete(`/orders/${id}`)
         .then((response) => {
           // Process Delete data table
+          console.log(response)
 
-          this.users = this.users.filter((user) => user._id != id)
+          this.orders = this.orders.filter((order) => order._id != id)
           let params = {
             message: 'DELETE_SUCCESS',
-            fullname: this.itemDelete.fullname,
+            customerName: this.itemDelete.customerName,
           }
           this.showAlert(params)
           this.closeDelete()
         })
-        .catch((err) => {
+        .catch((error) => {
           this.loading = false
-          console.log(err)
+          console.log(error)
           this.closeDelete()
         })
+    },
+    currency(value) {
+      return Intl.NumberFormat('en-US').format(value)
     },
     showAlert(params) {
       if (params.message == 'UPDATE_SUCCESS') {
         ;(this.alert.show = true),
           (this.alert.type = 'success'),
           (this.alert.message = this.$t(params.message, {
-            title: params.fullname,
+            customerName: params.customerName,
           }))
       } else if (params.message == 'DELETE_SUCCESS') {
         ;(this.alert.show = true),
@@ -192,18 +215,16 @@ export default {
   watch: {
     options: {
       handler() {
-        this.fetchUsers()
+        this.fetchOrders()
       },
       deep: true,
     },
     search: {
       handler() {
-        this.fetchUsers()
+        this.fetchOrders()
       },
-      // deep: true,
     },
   },
-
   mounted() {
     this.showAlert(this.$route.params)
   },

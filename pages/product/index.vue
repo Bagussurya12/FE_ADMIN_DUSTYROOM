@@ -3,7 +3,7 @@
     <v-col cols="10" offset="1">
       <v-card class="my-3">
         <v-toolbar color="black" dark>
-          Users Management
+          Product Management
           <v-spacer></v-spacer>
           <v-text-field
             v-model="search"
@@ -21,15 +21,15 @@
           <div class="mb-4 d-flex">
             <v-breadcrumbs :items="breadCrumbs" class="pa-0" />
             <v-spacer></v-spacer>
-            <v-btn to="/users/create" color="black" dark elevation="3" small>
-              Add User <v-icon right>mdi-plus-circle</v-icon></v-btn
+            <v-btn to="/product/create" color="black" dark elevation="3" small>
+              Add Product <v-icon right>mdi-plus-circle</v-icon></v-btn
             >
           </div>
           <v-data-table
             :headers="headers"
             :items-per-page="10"
             :server-items-length="totalData"
-            :items="users"
+            :items="products"
             :loading="loading"
             :search.sync="search"
             :options.sync="options"
@@ -41,7 +41,7 @@
               <v-dialog v-model="dialogDelete" max-width="500px">
                 <v-card>
                   <v-card-title
-                    >Delete This Data {{ itemDelete.fullname }}?</v-card-title
+                    >Delete This Data {{ itemDelete.title }}?</v-card-title
                   >
                   <v-card-actions>
                     <v-btn color="black " dark text @click="closeDelete"
@@ -60,7 +60,7 @@
               </v-dialog>
             </template>
             <template v-slot:item.actions="{ item }">
-              <v-btn :to="`users/edit/${item._id}`" icon color="black" dark>
+              <v-btn :to="`product/edit/${item._id}`" icon color="black" dark>
                 <v-icon class="small">mdi-pencil</v-icon>
               </v-btn>
               <v-btn color="black" dark small @click="deleteItem(item)" icon>
@@ -75,12 +75,10 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
-
 export default {
   middleware: ['authenticated'],
   head: {
-    title: 'USERS MANAGEMENT',
+    title: 'PRODUCTS MANAGEMENT',
   },
   data() {
     return {
@@ -95,39 +93,42 @@ export default {
         type: '',
         message: '',
       },
-      users: [],
+      products: [],
       headers: [
         { text: '#', value: 'row', sortable: false },
-        { text: 'Full Name', value: 'fullname', sortable: false },
-        { text: 'Email', value: 'email', sortable: false },
-        { text: 'Phone Number ', value: 'phoneNumber', sortable: false },
-        { text: 'Role ', value: 'role', sortable: false },
+        { text: 'Name', value: 'title', sortable: false },
+        { text: 'Price', value: 'price', sortable: false },
+        { text: 'Description', value: 'description', sortable: false },
+        { text: 'Image', value: 'image', sortable: false },
+        { text: 'Status', value: 'status', sortable: false },
         { text: '', value: 'actions', sortable: false },
       ],
       breadCrumbs: [
         {
-          text: 'Users',
+          text: 'Product',
           disabled: true,
-          to: '/users',
+          to: '/products',
         },
       ],
     }
   },
   methods: {
-    fetchUsers() {
+    fetchProduct() {
       const { page, itemsPerPage } = this.options
       this.loading = true
 
       this.$axios
-        .$get(`/users?page=${page}&limit=${itemsPerPage}&search=${this.search}`)
+        .$get(
+          `/products/product?page=${page}&limit=${itemsPerPage}&search=${this.search}`
+        )
         .then((response) => {
           this.loading = false
-          this.users = response.users.docs
-          this.totalData = response.users.totalDocs
+          this.products = response.product.docs
+          this.totalData = response.product.totalDocs
 
           // let startItem = (page - 1) * itemsPerPage + 1
-          let startItem = response.users.pagingCounter
-          this.users.map((user) => (user.row = startItem++))
+          let startItem = response.product.pagingCounter
+          this.products.map((product) => (product.row = startItem++))
         })
         .catch((err) => {
           this.loading = false
@@ -143,14 +144,15 @@ export default {
     },
     deleteConfirm(id) {
       this.$axios
-        .$delete(`/users/${id}`)
+        .$delete(`/products/${id}`)
         .then((response) => {
           // Process Delete data table
+          console.log(response)
 
-          this.users = this.users.filter((user) => user._id != id)
+          this.products = this.products.filter((product) => product._id != id)
           let params = {
             message: 'DELETE_SUCCESS',
-            fullname: this.itemDelete.fullname,
+            title: this.itemDelete.title,
           }
           this.showAlert(params)
           this.closeDelete()
@@ -192,18 +194,17 @@ export default {
   watch: {
     options: {
       handler() {
-        this.fetchUsers()
+        this.fetchProduct()
       },
       deep: true,
     },
     search: {
       handler() {
-        this.fetchUsers()
+        this.fetchProduct()
       },
       // deep: true,
     },
   },
-
   mounted() {
     this.showAlert(this.$route.params)
   },

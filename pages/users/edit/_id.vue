@@ -140,7 +140,7 @@ export default {
             v === this.form.password ||
             this.$t('Re_Password_Must_Be_Same_With_Password'),
         ],
-        role: [(v) => v === this.form.password || this.$t('Role_IS_Required')],
+        role: [(v) => v === this.form.role || this.$t('Role_IS_Required')],
       },
     }
   },
